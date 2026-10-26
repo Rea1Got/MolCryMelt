@@ -1,0 +1,77 @@
+####################################################################### 
+# 
+# This file contains crystal structure data downloaded from the 
+# Cambridge Structural Database (CSD) hosted by the Cambridge 
+# Crystallographic Data Centre (CCDC).
+# 
+# Full information about CCDC data access policies and citation 
+# guidelines are available at http://www.ccdc.cam.ac.uk/access/V1 
+# 
+# Audit and citation data items may have been added by the CCDC. 
+# Please retain this information to preserve the provenance of 
+# this file and to allow appropriate attribution of the data. 
+# 
+#######################################################################
+
+data_bk0008_structure_1_of_1
+_audit_block_doi                 10.5517/cc4dtx7
+_database_code_depnum_ccdc_archive 'CCDC 131499'
+loop_
+_citation_id
+_citation_doi
+_citation_year
+1 10.1107/S0108768194014102 1995
+_audit_update_record             
+;
+1999-07-13 deposited with the CCDC.	2026-09-17 downloaded from the CCDC.
+;
+#data_bk0008a
+
+_cell_length_a                   5.549(1)
+_cell_length_b                   5.033(1)
+_cell_length_c                   21.548(4)
+_cell_angle_alpha                90.0
+_cell_angle_beta                 89.22(1)
+_cell_angle_gamma                90.0
+_cell_volume                     601.74(1)
+_cell_formula_units_Z            4
+_symmetry_cell_setting           monoclinic
+_symmetry_space_group_name_Hall  '-P 2ybc'
+_symmetry_space_group_name_H-M   'P 1 21/c 1'
+_chemical_formula_sum            'C7 H7 N1 O1'
+_chemical_formula_moiety         ?
+_diffrn_radiation_type           Mo
+_diffrn_radiation_wavelength     0.71073
+_exptl_crystal_F_000             64
+_exptl_crystal_density_meas      ?
+_exptl_crystal_density_diffrn    1.35
+_exptl_absorpt_coefficient_mu    0.086
+_chemical_formula_weight         121.14
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_U_iso_or_equiv
+C(1) .47492(15) .06764(17) .10953(4) ?
+C(2) .64748(17) .26935(19) .10486(4) ?
+C(3) .82423(17) .29445(20) .14980(5) ?
+C(4) .82792(17) .11971(21) .19992(5) ?
+C(5) .65380(18) -.07923(20) .20525(4) ?
+C(6) .47921(17) -.10644(18) .16000(4) ?
+C(7) .28637(16) .02791(16) .06140(4) ?
+O .19589(21) -.19510(20) .05334(5) ?
+N .22277(12) .23983(13) .02795(3) ?
+H(2) .64685(46) .40519(53) .06556(11) ?
+H(3) .95821(44) .45049(54) .14538(12) ?
+H(4) .96479(43) .13881(57) .23501(12) ?
+H(5) .65328(48) -.21417(55) .24475(12) ?
+H(6) .34514(43) -.26302(48) .16299(12) ?
+H(7) .08546(39) .21870(43) -.00281(10) ?
+H(8) .26573(41) .42622(40) .04160(10) ?
+#+------------------------------------------------------------
+
+
+#+-------------------------------------------------------------
+

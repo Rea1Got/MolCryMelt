@@ -1,0 +1,369 @@
+####################################################################### 
+# 
+# This file contains crystal structure data downloaded from the 
+# Cambridge Structural Database (CSD) hosted by the Cambridge 
+# Crystallographic Data Centre (CCDC).
+# 
+# Full information about CCDC data access policies and citation 
+# guidelines are available at http://www.ccdc.cam.ac.uk/access/V1 
+# 
+# Audit and citation data items may have been added by the CCDC. 
+# Please retain this information to preserve the provenance of 
+# this file and to allow appropriate attribution of the data. 
+# 
+#######################################################################
+
+data_Caffeine
+_audit_block_doi                 10.5517/ccnh4qz
+_database_code_depnum_ccdc_archive 'CCDC 610381'
+loop_
+_citation_id
+_citation_doi
+_citation_year
+1 10.1002/chem.200600973 2007
+_audit_update_record             
+;
+2006-06-08 deposited with the CCDC.	2026-09-17 downloaded from the CCDC.
+;
+
+_chemical_name_systematic        
+;
+caffeine anhydrous
+;
+_chemical_name_common            Caffeine
+_chemical_formula_moiety         'C8 H10 N4 O2'
+_chemical_formula_structural     'C8 H10 N4 O2'
+_chemical_formula_analytical     ?
+_chemical_formula_sum            'C8 H10 N4 O2'
+_chemical_formula_weight         194.20
+_chemical_melting_point          ?
+_chemical_compound_source        'Merck KGaA, Darmstadt, Germany'
+
+_symmetry_cell_setting           monoclinic
+_symmetry_space_group_name_H-M   'C c'
+_symmetry_space_group_name_Hall  'C -2yc'
+_symmetry_Int_Tables_number      9
+loop_
+_symmetry_equiv_pos_site_id
+_symmetry_equiv_pos_as_xyz
+1 x,-y,1/2+z
+2 x,y,z
+3 1/2+x,1/2-y,1/2+z
+4 1/2+x,1/2+y,z
+_cell_length_a                   43.0390(17)
+_cell_length_b                   15.06758(64)
+_cell_length_c                   6.95314(14)
+_cell_angle_alpha                90
+_cell_angle_beta                 99.0274(22)
+_cell_angle_gamma                90
+_cell_volume                     4453.21
+_cell_formula_units_Z            20
+_cell_measurement_temperature    295
+
+_exptl_crystal_density_diffrn    1.448
+_exptl_crystal_density_meas      1.483(10)
+_exptl_crystal_density_method    pycnometric
+_exptl_crystal_F_000             2040
+
+_exptl_absorpt_coefficient_mu    0.910
+_exptl_absorpt_correction_type   none
+_exptl_absorpt_correction_T_min  1
+_exptl_absorpt_correction_T_max  1
+
+_diffrn_radiation_type           'Cu K\a1'
+_diffrn_radiation_wavelength     1.540598
+
+# The next three fields give the specimen dimensions in mm. The equatorial
+# plane contains the incident and diffracted beam.
+_pd_spec_size_axial              ? # perpendicular to
+# equatorial plane
+
+_pd_spec_size_equat              ? # parallel to
+# scattering vector
+# in transmission
+
+_pd_spec_size_thick              ? # parallel to
+# scattering vector
+# in reflection
+
+# The next five fields are character fields that describe the specimen.
+
+_pd_spec_mounting                
+;
+0.3 mm capillary
+;
+_pd_spec_mount_mode              transmission # options are 'reflection'
+# or 'transmission'
+
+_pd_spec_shape                   cylinder # options are 'cylinder',
+# 'flat_sheet' or 'irregular'
+
+
+_pd_char_particle_morphology     ?
+_pd_char_colour                  white # use ICDD colour descriptions
+
+# The following three fields describe the preparation of the specimen.
+# The cooling rate is in K/min. The pressure at which the sample was
+# prepared is in kPa. The temperature of preparation is in K.
+
+
+
+_pd_prep_cool_rate               ?
+_pd_prep_pressure                ?
+_pd_prep_temperature             298
+
+
+# 7. EXPERIMENTAL DATA
+
+_exptl_special_details           
+; ?
+;
+
+# The following item is used to identify the equipment used to record
+# the powder pattern when the diffractogram was measured at a laboratory
+# other than the authors' home institution, e.g. when neutron or synchrotron
+# radiation is used.
+
+_pd_instr_location               
+; ?
+;
+_pd_calibration_special_details  
+# description of the method used
+# to calibrate the instrument
+; ?
+;
+
+_diffrn_ambient_temperature      298
+_diffrn_source                   'sealed X-ray tube'
+_diffrn_source_target            Cu
+_diffrn_source_type              ?
+_diffrn_measurement_device_type  'Bruker D8 Vario1'
+_diffrn_detector                 'proportional counter'
+_diffrn_detector_type            'Braun PSD' # make or model of detector
+
+_pd_meas_scan_method             step # options are 'step', 'cont',
+# 'tof', 'fixed' or
+# 'disp' (= dispersive)
+_pd_meas_special_details         
+; ?
+;
+# 8. REFINEMENT DATA
+
+# Use the next field to give any special details about the fitting of the
+# powder pattern.
+
+_pd_proc_ls_special_details      
+; ?
+;
+
+# The next three items are given as text.
+
+_pd_proc_ls_profile_function     'fundamental parameters'
+_pd_proc_ls_background_function  Chebychev
+_pd_proc_ls_pref_orient_corr     
+; ?
+;
+
+_pd_proc_ls_prof_R_factor        0.0433
+_pd_proc_ls_prof_wR_factor       0.0570
+_pd_proc_ls_prof_wR_expected     0.0276
+_refine_ls_R_I_factor            0.0107
+_refine_ls_R_Fsqd_factor         ?
+_refine_ls_R_factor_all          ?
+
+_refine_special_details          
+;
+Background corrected agreement factors
+;
+
+_refine_ls_matrix_type           ?
+_refine_ls_weighting_scheme      
+? # options are 'sigma' (based on measured su's)
+# or 'calc' (calculated weights)
+_refine_ls_weighting_details     ?
+_refine_ls_hydrogen_treatment    constr
+_refine_ls_extinction_method     ?
+_refine_ls_extinction_coef       ?
+_refine_ls_number_parameters     56
+_refine_ls_number_restraints     ?
+_refine_ls_number_constraints    ?
+
+# The following item is the same as CHI, the square root of 'CHI squared'
+_refine_ls_goodness_of_fit_all   2.07
+
+_refine_ls_restrained_S_all      ?
+_refine_ls_shift/su_max          ?
+_refine_ls_shift/su_mean         ?
+
+# The following four items apply to angular dispersive measurements.
+# 2theta minimum, maximum and increment (in degrees) are for the
+# intensities used in the refinement.
+
+_pd_proc_2theta_range_min        5.5
+_pd_proc_2theta_range_max        70.0
+_pd_proc_2theta_range_inc        0.0143
+_pd_proc_wavelength              1.540598
+
+# Each refinement must be accompanied by a listing of the powder data
+# in CIF format. Each listing should be sent as a separate file consisting
+# of one data block containing a single powder profile. The value of
+# _pd_block_diffractogram_id is used to associate each refinement with
+# its corresponding powder profile, since it must match the value
+# of _pd_block_id in the file containing the powder data. A template
+# for supplying powder data in CIF format is available by ftp at
+# ftp://ftp.iucr.org/pub/rietdataform.cif and an example is given
+# at ftp://ftp.iucr.org/pub/rietdataxmpl.cif.
+
+_pd_block_diffractogram_id       1
+
+
+# Give appropriate details in the next two text fields.
+
+_pd_proc_info_excluded_regions   ?
+_pd_proc_info_data_reduction     ?
+
+# The following items are used to identify the programs used.
+
+_computing_data_collection       ?
+_computing_cell_refinement       'TOPAS, (Bruker AXS, 2000)'
+_computing_data_reduction        ?
+_computing_structure_solution    'TOPAS, (Bruker AXS, 2000)'
+_computing_structure_refinement  'TOPAS, (Bruker AXS, 2000)'
+_computing_molecular_graphics    'DIAMOND (Crystal Impact GbR, 2005)'
+_computing_publication_material  ?
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_B_iso_or_equiv
+
+C1_a C 0.55017 0.96722 0.21272 1.14000
+N2_a N 0.51923 0.95362 0.12724 1.14000
+N3_a N 0.58115 1.09672 0.30546 1.14000
+C4_a C 0.60658 1.04458 0.37463 1.14000
+C5_a C 0.55342 1.05727 0.22524 1.14000
+N6_a N 0.52646 1.10009 0.15234 1.14000
+N7_a N 0.60292 0.95341 0.35439 1.14000
+C8_a C 0.57495 0.90743 0.27617 1.14000
+O9_a O 0.57437 0.82656 0.26816 1.14000
+O10_a O 0.63148 1.07761 0.45009 1.14000
+C11_a C 0.63067 0.89868 0.42126 1.14000
+C12_a C 0.58406 1.19358 0.31943 1.14000
+C13_a C 0.50318 0.86907 0.07985 1.14000
+C14_a C 0.50658 1.03435 0.09528 1.14000
+H1_a H 0.48423 1.04431 0.03412 1.14000
+H2_a H 0.62519 0.83460 0.39938 1.14000
+H3_a H 0.64794 0.91482 0.34681 1.14000
+H4_a H 0.63785 0.90924 0.56328 1.14000
+H5_a H 0.60587 1.20963 0.38164 1.14000
+H6_a H 0.57966 1.22005 0.18604 1.14000
+H7_a H 0.56862 1.21718 0.40013 1.14000
+H8_a H 0.48090 0.88042 0.01913 1.14000
+H9_a H 0.51418 0.83537 -0.01357 1.14000
+H10_a H 0.50348 0.83348 0.20152 1.14000
+C1_b C 0.80283 0.96933 0.95185 1.14000
+N2_b N 0.82580 0.90439 0.98850 1.14000
+N3_b N 0.74697 0.96605 0.85428 1.14000
+C4_b C 0.74591 1.05698 0.85993 1.14000
+C5_b C 0.77539 0.92374 0.89976 1.14000
+N6_b N 0.77998 0.83481 0.90134 1.14000
+N7_b N 0.77426 1.10168 0.90728 1.14000
+C8_b C 0.80452 1.06293 0.95909 1.14000
+O9_b O 0.82789 1.10910 1.00088 1.14000
+O10_b O 0.72090 1.09666 0.82357 1.14000
+C11_b C 0.77293 1.19889 0.90457 1.14000
+C12_b C 0.71771 0.91581 0.80066 1.14000
+C13_b C 0.85961 0.91654 1.04975 1.14000
+C14_b C 0.81084 0.82679 0.95607 1.14000
+H1_b H 0.82185 0.76817 0.97156 1.14000
+H2_b H 0.79463 1.22348 0.94087 1.14000
+H3_b H 0.76382 1.21967 0.77098 1.14000
+H4_b H 0.75941 1.21992 0.99997 1.14000
+H5_b H 0.69960 0.95793 0.77279 1.14000
+H6_b H 0.71906 0.87941 0.68200 1.14000
+H7_b H 0.71447 0.87581 0.91055 1.14000
+H8_b H 0.87017 0.85728 1.06460 1.14000
+H9_b H 0.86845 0.95202 0.94944 1.14000
+H10_b H 0.86336 0.94865 1.17715 1.14000
+C1_c C 1.00493 0.96716 0.52196 1.14000
+N2_c N 1.03641 0.94752 0.52314 1.14000
+N3_c N 0.97569 1.10254 0.51665 1.14000
+C4_c C 0.94850 1.05553 0.52068 1.14000
+C5_c C 1.00341 1.05766 0.51682 1.14000
+N6_c N 1.03195 1.09508 0.51414 1.14000
+N7_c N 0.95057 0.96365 0.51957 1.14000
+C8_c C 0.97834 0.91230 0.52292 1.14000
+O9_c O 0.97737 0.83138 0.52443 1.14000
+O10_c O 0.92350 1.09353 0.52412 1.14000
+C11_c C 0.92112 0.91428 0.51540 1.14000
+C12_c C 0.97462 1.19982 0.51318 1.14000
+C13_c C 1.05118 0.86000 0.52818 1.14000
+C14_c C 1.05103 1.02559 0.51827 1.14000
+H1_c H 1.07418 1.03114 0.51779 1.14000
+H2_c H 0.92554 0.84914 0.51496 1.14000
+H3_c H 0.90619 0.93035 0.39532 1.14000
+H4_c H 0.91151 0.92962 0.63305 1.14000
+H5_c H 0.95251 1.22016 0.51361 1.14000
+H6_c H 0.98213 1.22197 0.39290 1.14000
+H7_c H 0.98847 1.22376 0.63063 1.14000
+H8_c H 1.07427 0.86695 0.52781 1.14000
+H9_c H 1.04168 0.82512 0.41124 1.14000
+H10_c H 1.04769 0.82795 0.64893 1.14000
+C1_d C 0.18069 0.92961 0.57987 1.14000
+N2_d N 0.18709 0.83944 0.59059 1.14000
+N3_d N 0.21243 1.06018 0.63949 1.14000
+C4_d C 0.18624 1.11261 0.59481 1.14000
+C5_d C 0.20925 0.96965 0.63081 1.14000
+N6_d N 0.23288 0.90991 0.67166 1.14000
+N7_d N 0.15767 1.07021 0.53756 1.14000
+C8_d C 0.15232 0.97714 0.52782 1.14000
+O9_d O 0.12596 0.94722 0.47779 1.14000
+O10_d O 0.18818 1.19348 0.60445 1.14000
+C11_d C 0.13009 1.12710 0.48217 1.14000
+C12_d C 0.24329 1.10190 0.69653 1.14000
+C13_d C 0.16484 0.76594 0.55067 1.14000
+C14_d C 0.21818 0.83231 0.64522 1.14000
+H1_d H 0.22934 0.77400 0.66437 1.14000
+H2_d H 0.11102 1.08932 0.44396 1.14000
+H3_d H 0.13341 1.16540 0.36969 1.14000
+H4_d H 0.12700 1.16547 0.59500 1.14000
+H5_d H 0.24085 1.16791 0.69430 1.14000
+H6_d H 0.25763 1.08395 0.60331 1.14000
+H7_d H 0.25245 1.08233 0.83092 1.14000
+H8_d H 0.17642 0.70832 0.57079 1.14000
+H9_d H 0.15392 0.76975 0.41294 1.14000
+H10_d H 0.14893 0.76941 0.64093 1.14000
+C1_e C 0.37152 0.93993 0.63610 1.14000
+N2_e N 0.38333 0.85458 0.66493 1.14000
+N3_e N 0.39408 1.08480 0.68890 1.14000
+C4_e C 0.36543 1.12281 0.62300 1.14000
+C5_e C 0.39668 0.99410 0.69389 1.14000
+N6_e N 0.42329 0.94757 0.75597 1.14000
+N7_e N 0.34050 1.06622 0.55939 1.14000
+C8_e C 0.34112 0.97194 0.56267 1.14000
+O9_e O 0.31749 0.92882 0.50518 1.14000
+O10_e O 0.36219 1.20343 0.61993 1.14000
+C11_e C 0.31035 1.10778 0.48153 1.14000
+C12_e C 0.42133 1.14184 0.75358 1.14000
+C13_e C 0.36637 0.77078 0.62673 1.14000
+C14_e C 0.41390 0.86366 0.73552 1.14000
+H1_e H 0.42834 0.81209 0.76972 1.14000
+H2_e H 0.29430 1.06069 0.44067 1.14000
+H3_e H 0.31294 1.14532 0.36649 1.14000
+H4_e H 0.30321 1.14574 0.58422 1.14000
+H5_e H 0.41484 1.20551 0.73913 1.14000
+H6_e H 0.43810 1.12978 0.67243 1.14000
+H7_e H 0.42967 1.12917 0.89333 1.14000
+H8_e H 0.38117 0.72011 0.66198 1.14000
+H9_e H 0.35731 0.76703 0.48544 1.14000
+H10_e H 0.34899 0.76778 0.70660 1.14000
+
+#END
+
+
+
+
+
