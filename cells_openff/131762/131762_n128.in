@@ -1,0 +1,161 @@
+###############################################################################
+# Склейка кристалл | жидкость вдоль OZ + разогрев/охлаждение (метод двух фаз)
+#   запуск:  lmp -in two_phase.in        (именно -in, не '<': ниже используется jump SELF)
+###############################################################################
+
+# ============================ ПАРАМЕТРЫ (менять здесь) =======================
+variable cryst_file   string cells_openff/131762/131762_n128.data
+variable liq_file     string cells_openff/131762/131762_n128_liquid.data
+variable out          string cells_openff/131762/131762_two_phase
+
+variable T_term_cryst equal 280.0    # K, термостат в кристалле (холодный)
+variable T_term_liq   equal 340.0    # K, термостат в жидкости  (тёплый)
+variable P            equal 1.0      # атм (units real)
+
+variable w_term       equal 10.0     # Å, толщина термостатируемого слоя в середине каждой фазы
+                                     # (очень большое число, напр. 1e6 -> термостат на всю фазу)
+variable T_eq         equal 0.5*(${T_term_cryst}+${T_term_liq})   # T короткого NPT-уравновешивания
+
+variable dt           equal 1.0      # fs
+variable n_eq         equal 20000    # шагов NPT-уравновешивания (короткое)
+variable n_prod       equal 500000   # шагов основного прогона с термостатами
+variable Tdamp        equal 100.0    # fs, Nose-Hoover (уравновешивание)
+variable Tdamp_lan    equal 100.0    # fs, Ланжевен (слои-термостаты)
+variable Pdamp        equal 1000.0   # fs
+variable comm_cut     equal 14.0     # Å, радиус обмена призраками (должен быть > 9 + skin)
+variable seed         equal 48291
+variable seed2        equal 48292
+# =============================================================================
+
+# ----------------------------------------------------------------------------
+# Проход 1 (пробный): узнаём высоту жидкой ячейки по оси z, затем clear.
+# Проход 2: основной расчёт. Переменные переживают clear.
+# ----------------------------------------------------------------------------
+variable pass index 1
+label start
+
+units real
+atom_style full
+dimension 3
+boundary p p p
+
+bond_style harmonic
+angle_style harmonic
+dihedral_style fourier
+improper_style cvff
+special_bonds lj 0.0 0.0 0.5 coul 0.0 0.0 0.8333333333
+pair_style lj/cut/coul/long 9.0 9.0
+pair_modify mix arithmetic tail yes
+
+if "${pass} == 2" then "jump SELF main"
+
+read_data ${liq_file}
+variable Lz_liq equal $(zhi-zlo)
+variable xlo_l   equal $(xlo)
+variable ylo_l   equal $(ylo)
+variable zlo_l   equal $(zlo)
+clear
+variable pass delete
+variable pass index 2
+jump SELF start
+
+label main
+
+# ----------------------------------------------------------------------------
+# Склейка: кристалл внизу, жидкость сверху, общая коробка = a, b кристалла и
+# сумма высот по z. Типы атомов/связей в обоих файлах должны совпадать.
+# ----------------------------------------------------------------------------
+read_data ${cryst_file}
+group cryst union all
+
+variable z0       equal $(zlo)
+variable Lc       equal $(zhi-zlo)
+variable Ltot     equal ${Lc}+${Lz_liq}
+variable zhi_new  equal ${z0}+${Ltot}
+variable xlo_c    equal $(xlo)
+variable ylo_c    equal $(ylo)
+# у файлов разные начала координат: совмещаем нижние грани коробок
+variable xshift   equal (${xlo_c})-(${xlo_l})
+variable yshift   equal (${ylo_c})-(${ylo_l})
+variable zshift   equal (${z0})+(${Lc})-(${zlo_l})
+
+change_box all z final ${z0} ${zhi_new}
+read_data ${liq_file} add append shift ${xshift} ${yshift} ${zshift}
+group liq subtract all cryst
+
+print "Высоты по z: кристалл ${Lc} A, жидкость ${Lz_liq} A, итого ${Ltot} A"
+print "Атомов: $(atoms), кристалл $(count(cryst)), жидкость $(count(liq))"
+
+# доли высоты, где лежат центры фаз (нужны, чтобы после NPT найти их в новой коробке)
+variable fc_cr  equal 0.5*${Lc}/${Ltot}
+variable fc_liq equal (${Lc}+0.5*${Lz_liq})/${Ltot}
+
+comm_modify mode single cutoff ${comm_cut} vel yes
+kspace_style pppm 1e-4              # строго после read_data (триклинная коробка)
+
+compute Tcr cryst temp
+compute Tli liq temp
+thermo_style custom step temp c_Tcr c_Tli press pe etotal vol lx ly lz density
+thermo 1000
+thermo_modify flush yes
+
+# ----------------------------------------------------------------------------
+# 0. Релаксация контактов (без SHAKE): на стыке фаз и в жидкости есть перекрытия
+# ----------------------------------------------------------------------------
+min_style cg
+minimize 1.0e-4 1.0e-6 2000 20000
+
+timestep 0.2
+fix relax all nve/limit 0.05
+thermo 500
+run 5000
+unfix relax
+reset_timestep 0
+
+# ----------------------------------------------------------------------------
+# 1. Короткое NPT-уравновешивание обеих групп при T_eq и P
+#    (баростат один на всю коробку, поэтому обе группы идут одним fix npt)
+# ----------------------------------------------------------------------------
+timestep ${dt}
+fix shk all shake 0.0001 20 10 m 1.008        # все связи с H (масса ~1.008); ДО npt/nph
+fix npt_eq all npt temp ${T_eq} ${T_eq} ${Tdamp} aniso ${P} ${P} ${Pdamp}
+velocity all create ${T_eq} ${seed} dist gaussian mom yes rot yes
+thermo 1000
+run ${n_eq}
+unfix npt_eq
+unfix shk
+
+# ----------------------------------------------------------------------------
+# 2. Основной прогон: давление P на всю коробку (nph) + раздельные термостаты
+#    Ланжевена в слоях посередине кристалла (холодный) и жидкости (тёплый)
+#    nph + langevin = NPT; порядок: langevin (добавляет силы) -> shake -> nph (меняет коробку)
+# ----------------------------------------------------------------------------
+variable zcr_lo equal $(zlo+v_fc_cr*lz-0.5*v_w_term)
+variable zcr_hi equal $(zlo+v_fc_cr*lz+0.5*v_w_term)
+variable zli_lo equal $(zlo+v_fc_liq*lz-0.5*v_w_term)
+variable zli_hi equal $(zlo+v_fc_liq*lz+0.5*v_w_term)
+print "Слой-термостат кристалла: z = ${zcr_lo} .. ${zcr_hi} A (T = ${T_term_cryst} K)"
+print "Слой-термостат жидкости:  z = ${zli_lo} .. ${zli_hi} A (T = ${T_term_liq} K)"
+
+region r_tcr block INF INF INF INF ${zcr_lo} ${zcr_hi} units box
+region r_tli block INF INF INF INF ${zli_lo} ${zli_hi} units box
+group tcr dynamic cryst region r_tcr every 100
+group tli dynamic liq   region r_tli every 100
+
+fix lan_cr tcr langevin ${T_term_cryst} ${T_term_cryst} ${Tdamp_lan} ${seed}  zero yes
+fix lan_li tli langevin ${T_term_liq}   ${T_term_liq}   ${Tdamp_lan} ${seed2} zero yes
+fix shk all shake 0.0001 20 10 m 1.008
+fix nph_all all nph aniso ${P} ${P} ${Pdamp}
+
+# профили плотности и температуры вдоль z (для поиска границы раздела)
+compute zb all chunk/atom bin/1d z lower 0.02 units reduced
+fix prof all ave/chunk 10 100 10000 zb density/mass temp file ${out}_zprofile.dat
+
+dump traj all custom 1000 ${out}.lammpstrj id mol type x y z ix iy iz
+dump_modify traj sort id
+
+thermo 1000
+run ${n_prod}
+
+write_data ${out}_final.data
+write_restart ${out}.restart
