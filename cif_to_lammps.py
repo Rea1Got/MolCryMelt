@@ -16,6 +16,7 @@ CIF (молекулярный кристалл) -> LAMMPS (data + input) с си
      с кристаллической суперъячейкой, вектор c направлен строго вдоль z (без скосов).
 
 Файлы пишутся в <output>/<имя_cif>/<имя_cif>_n<N>[_liquid].{data,in,pdb}
+(кристалл и жидкость — два отдельных файла; склейка делается в LAMMPS, см. two_phase.in)
 
 Примеры:
   python cif_to_lammps.py structures/128707.cif -n 64
@@ -642,6 +643,12 @@ def main():
             str(outdir / f"{prefix}_liquid.data"),
             str(outdir / f"{prefix}_liquid.in"),
         )
+
+    if liquid is not None:
+        print("\nДля two_phase.in:")
+        print(f"  variable cryst_file   string {outdir / (prefix + '.data')}")
+        print(f"  variable liq_file     string {outdir / (prefix + '_liquid.data')}")
+        print(f"  variable n_mol_cryst  equal {len(molecules)}")
 
     print("\n✅ Готово!")
 
