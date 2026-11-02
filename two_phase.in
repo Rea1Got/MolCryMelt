@@ -5,30 +5,37 @@
 #      NPT только вдоль z                   -> запись равновесной ячейки
 #   3) склейка (join_phases.py) -> minimize -> общий NPT (aniso)
 #   запуск:  mpirun -np 4 lmp -in two_phase.in   (-in: используется jump SELF)
+#   ВАЖНО: ~250+ атомов на процесс (кристалл/жидкость ~2000 атомов -> 8 процессов).
+#   Серия температур: отдельный mpirun на каждую T (см. run.sh), -var T_run <K>.
 ###############################################################################
-variable dir	      string cells_openff/131762/
+
 # ============================ ПАРАМЕТРЫ (менять здесь) =======================
-variable cryst_file   string ${dir}131762_n256.data
-variable liq_file     string ${dir}131762_n256_liquid.data
+# Каталог для всех выходных файлов. Из командной строки:  lmp -in two_phase.in -var dir results/run1
+# (каталог должен существовать: mkdir -p results/run1). Без -var используется значение ниже.
+variable dir          index .
+variable cryst_file   string ${dir}/131762_n256.data
+variable liq_file     string ${dir}/131762_n256_liquid.data
 variable n_mol_cryst  equal 256      # число молекул кристалла (печатает cif_to_lammps.py)
-variable out          string ${dir}131762_n256_two_phase
 variable join_script  string join_phases.py
 
-variable T_run        equal 400.0    # K, температура общего прогона
+# Значение по умолчанию; из командной строки:  -var T_run 400  (run.sh запускает по mpirun на температуру)
+variable T_run        index 360.0    # K, температура общего прогона
+variable out          string ${dir}/131762_n256_two_phase_T${T_run}
 variable T_cryst      equal ${T_run} # K, уравновешивание кристалла
 variable T_liq        equal ${T_run} # K, уравновешивание жидкости
 variable P            equal 1.0      # атм (units real)
 
 variable dt           equal 1.0      # fs
-variable n_nvt        equal 50000    # шагов NVT перед каждым NPT (термализация, снимает начальный скачок P)
+variable n_nvt        equal 10000    # шагов NVT перед каждым NPT (термализация, снимает начальный скачок P)
 variable n_squeeze    equal 100000   # шагов (0.5 fs) плавного сжатия жидкости по z
 variable n_eq_cryst   equal 100000   # шагов NPT кристалла
 variable n_eq_liq     equal 100000   # шагов NPT жидкости (только z)
-variable n_zonly      equal 100000    # шагов общего NPT только по z (закрыть зазоры на стыке)
-variable n_prod       equal 5000000  # шагов общего NPT (aniso)
+variable n_zonly      equal 50000    # шагов общего NPT только по z (закрыть зазоры на стыке)
+variable n_prod       equal 1000000  # шагов общего NPT (aniso)
 variable Tdamp        equal 100.0    # fs
 variable Pdamp        equal 5000.0   # fs (мягче баростат -> меньше раскачка коробки)
-variable comm_cut     equal 14.0     # Å
+variable comm_cut     equal 0.0      # Å; 0 = по умолчанию (cutoff+skin ~11 Å), >0 = расширить обмен призраками
+variable shake_print  equal 0        # 0 = не печатать статистику SHAKE; N = каждые N шагов
 variable seed         equal 48291
 # =============================================================================
 # файлы промежуточных результатов
@@ -66,7 +73,7 @@ if "${stage} == joined" then "jump SELF joined_stage"
 # СТАДИЯ 1: кристалл
 ###############################################################################
 read_data ${cryst_file}
-comm_modify mode single cutoff ${comm_cut} vel yes
+if "${comm_cut} > 0" then "comm_modify mode single cutoff ${comm_cut} vel yes" else "comm_modify mode single vel yes"
 kspace_style pppm 1e-4
 thermo_style custom step temp press pe vol lx ly lz density
 thermo 1000
@@ -77,7 +84,7 @@ minimize 1.0e-4 1.0e-6 2000 20000
 reset_timestep 0
 
 timestep ${dt}
-fix shk all shake 0.0001 20 1000 m 1.008           # SHAKE строго ДО npt
+fix shk all shake 0.0001 20 ${shake_print} m 1.008           # SHAKE строго ДО npt
 velocity all create ${T_cryst} ${seed} dist gaussian mom yes rot yes
 fix nvt_c all nvt temp ${T_cryst} ${T_cryst} ${Tdamp}
 run ${n_nvt}
@@ -94,7 +101,7 @@ write_data ${cryst_eq}
 clear
 next stage
 jump SELF stage_loop
-quit
+quit          # сюда попадаем, только если список стадий (-var stage ...) исчерпан
 
 ###############################################################################
 # СТАДИЯ 2: жидкость (x, y зафиксированы по кристаллу, расширение только вдоль z)
@@ -102,7 +109,7 @@ quit
 label liquid_stage
 read_data ${liq_file}
 change_box all x final $(xlo) $(xlo+v_lx_c) y final $(ylo) $(ylo+v_ly_c) xy final ${xy_c} remap units box
-comm_modify mode single cutoff ${comm_cut} vel yes
+if "${comm_cut} > 0" then "comm_modify mode single cutoff ${comm_cut} vel yes" else "comm_modify mode single vel yes"
 kspace_style pppm 1e-4
 thermo_style custom step temp press pe vol lx ly lz density
 thermo 1000
@@ -122,12 +129,12 @@ unfix relax
 reset_timestep 0
 
 timestep 0.5
-fix shk all shake 0.0001 20 1000 m 1.008          # SHAKE строго ДО deform/npt
+fix shk all shake 0.0001 20 ${shake_print} m 1.008          # SHAKE строго ДО deform/npt
 velocity all create ${T_liq} ${seed} dist gaussian mom yes rot yes
 
-# --- Этап 1: плавное сжатие по z (NVT + deform) до ~95% плотности кристалла ---
+# --- Этап 1: плавное сжатие по z (NVT + deform) до ~90% плотности кристалла ---
 # жидкость стартует растянутой (factor>1); барростат не должен делать этот скачок
-variable lz_t equal 1.05*${lz_c}
+variable lz_t equal 1.15*${lz_c}
 fix nvt_l all nvt temp ${T_liq} ${T_liq} ${Tdamp}
 fix def_l all deform 100 z final $(zlo) $(zlo+v_lz_t) remap x
 run ${n_squeeze}
@@ -146,7 +153,7 @@ write_data ${liq_eq}
 clear
 next stage
 jump SELF stage_loop
-quit
+quit          # сюда попадаем, только если список стадий (-var stage ...) исчерпан
 
 ###############################################################################
 # СТАДИЯ 3: склейка, minimize (убрать коллизии на стыке), общий NPT
@@ -157,7 +164,7 @@ shell python3 ${join_script} ${cryst_eq} ${liq_eq} ${joined}
 read_data ${joined}
 group cryst molecule <= ${n_mol_cryst}
 group liq subtract all cryst
-comm_modify mode single cutoff ${comm_cut} vel yes
+if "${comm_cut} > 0" then "comm_modify mode single cutoff ${comm_cut} vel yes" else "comm_modify mode single vel yes"
 kspace_style pppm 1e-4
 
 # проверка: молекулы целые (макс. длина связи ~1.5 Å)
@@ -190,7 +197,7 @@ reset_timestep 0
 
 # общий NPT
 timestep ${dt}
-fix shk all shake 0.0001 20 10000 m 1.008
+fix shk all shake 0.0001 20 ${shake_print} m 1.008
 velocity all create ${T_run} ${seed} dist gaussian mom yes rot yes
 fix nvt_j all nvt temp ${T_run} ${T_run} ${Tdamp}
 run ${n_nvt}
