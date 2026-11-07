@@ -412,7 +412,7 @@ def _wrap(d, cell, inv):
     return f @ cell
 
 
-def place_random(rel, cell, min_dist, rng, max_attempts=3000, floor=1.2, step=0.1):
+def place_random(rel, cell, min_dist, rng, max_attempts=20000, floor=1.2, step=0.1):
     """
     Случайно размещает жёсткие молекулы (rel[k] — координаты относительно центра)
     в периодической ячейке. Контакт между атомами разных молекул >= порога;
