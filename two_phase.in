@@ -24,28 +24,28 @@ variable T_run        index 500.0    # K, temperature (-var T_run ...)
 variable P            index 1.0      # atm (units real); -var P ...
 variable out          string ${dir}/n${n_mol_cryst}_T${T_run}_P${P}   # prefix of all output files
 variable T_cryst      equal ${T_run} # K, crystal equilibration
-variable T_liq        equal ${T_run} # K, liquid equilibration
 
 # --- crystal melting to obtain liquid ---
-variable melt_factor  equal 1.7      # T_melt = melt_factor * T_liq (significant superheat needed)
-variable T_melt       equal 700      # K
+# variable melt_factor  equal 1.7      # T_melt = melt_factor * T_liq (significant superheat needed)
+variable T_melt       equal 900      # K
+variable T_liq        equal (${T_melt}+${T_run})/2.0 # K, liquid equilibration
 variable melt_baro    string aniso   # barostat during melting: aniso or z (z: cross-section as in crystal)
 variable msd_melted   equal 20.0     # A^2: MSD of atoms (no COM drift) after melting; less -> stop
 
-variable join_gap     equal 1.0      # A: gap on EACH interface during joining (0 = no gap)
+variable join_gap     equal 0.5      # A: gap on EACH interface during joining (0 = no gap)
 
 variable dt           equal 1.0      # fs
 variable n_nvt        equal 10000    # NVT steps before crystal NPT
 variable n_eq_cryst   equal 100000   # crystal NPT steps
 variable n_melt       equal 100000   # NPT steps at T_melt
-variable n_cool       equal 100000   # cooling steps T_melt -> T_liq
-variable n_fit        equal 100000   # steps of liquid cross-section fitting to crystal (NVT + deform)
-variable n_eq_liq     equal 100000   # liquid NPT steps (z only)
-variable n_zonly      equal 100000   # steps of common NPT z only (close gaps at joint)
-variable n_prod       equal 2000000  # common NPT steps (aniso)
+variable n_cool       equal 50000   # cooling steps T_melt -> T_liq
+variable n_fit        equal 50000   # steps of liquid cross-section fitting to crystal (NVT + deform)
+variable n_eq_liq     equal 50000   # liquid NPT steps (z only)
+variable n_zonly      equal 50000   # steps of common NPT z only (close gaps at joint)
+variable n_prod       equal 500000  # common NPT steps (aniso)
 variable Tdamp        equal 100.0    # fs
 variable Pdamp        equal 5000.0   # fs (softer barostat -> less box fluctuation)
-variable comm_cut     equal 4.0      # A; 0 = default (cutoff+skin ~11 A), >0 = expand ghost exchange
+variable comm_cut     equal 0      # A; 0 = default (cutoff+skin ~11 A), >0 = expand ghost exchange
 variable shake_print  equal 0        # 0 = no SHAKE stats; N = every N steps
 variable seed         equal 48291
 # =============================================================================
@@ -68,7 +68,7 @@ angle_style harmonic
 dihedral_style fourier
 improper_style cvff
 special_bonds lj 0.0 0.0 0.5 coul 0.0 0.0 0.8333333333
-pair_style lj/cut/coul/long 9.0 9.0
+pair_style lj/cut/coul/long 12.0 12.0
 pair_modify mix arithmetic tail yes
 neigh_modify delay 0 every 1 check yes
 
@@ -138,26 +138,39 @@ if "$(c_msd[4]) < ${msd_melted}" then "error all 'Crystal did not melt (MSD too 
 unfix npt_m
 
 # --- b) cooling T_melt -> T_liq ---
+uncompute msd
+compute msd all msd com yes
+
 fix npt_m all npt temp ${T_melt} ${T_liq} ${Tdamp} ${melt_baro} ${P} ${P} ${Pdamp}
 run ${n_cool}
+if "$(c_msd[4]) < ${msd_melted}" then "error all 'Cooling stage: MSD=$(c_msd[4]) < ${msd_melted}. Liquid may have crystallized upon cooling — check T_liq or cooling rate.'"
 unfix npt_m
 
 # --- c) fitting cross-section (x, y, xy) to equilibrium crystal: smooth deformation in NVT ---
+uncompute msd
+compute msd all msd com yes
+
 fix nvt_l all nvt temp ${T_liq} ${T_liq} ${Tdamp}
 fix def_l all deform 100 x final $(xlo) $(xlo+v_lx_c) y final $(ylo) $(ylo+v_ly_c) xy final ${xy_c} remap x
 run ${n_fit}
+if "$(c_msd[4]) < ${msd_melted}" then "error all 'Deform/fit stage: MSD=$(c_msd[4]) < ${msd_melted}. Liquid lost fluidity during cross-section fitting.'"
 unfix def_l
 unfix nvt_l
 
 # --- d) NPT only along z (soft barostat): cross-section stays as in crystal ---
+uncompute msd
+compute msd all msd com yes
+
 fix npt_l all npt temp ${T_liq} ${T_liq} ${Tdamp} z ${P} ${P} ${Pdamp}
 run ${n_eq_liq}
+if "$(c_msd[4]) < ${msd_melted}" then "error all 'Z-only NPT stage: MSD=$(c_msd[4]) < ${msd_melted}. Liquid not fluid at the end of liquid equilibration.'"
 
 write_data ${liq_eq}
 clear
 next stage
 jump SELF stage_loop
 quit          # reached only if stage list (-var stage ...) is exhausted
+
 
 ###############################################################################
 # STAGE 3: joining (with gap), short minimize, common NPT
