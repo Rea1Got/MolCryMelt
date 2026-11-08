@@ -5,7 +5,7 @@
 #SBATCH --ntasks-per-node=32
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=64G
-#SBATCH --time=12:00:00
+#SBATCH --time=24:00:00
 #SBATCH --output=lmp_%j.out
 #SBATCH --error=lmp_%j.err
 
@@ -17,17 +17,20 @@ cd "${SLURM_SUBMIT_DIR:-$PWD}"
 INPUT=${1:-two_phase.in}
 LMP_BIN=${LMP_BIN:-lmp}
 MPIRUN=${MPIRUN:-mpirun}
-DIR=cells_openff/199977
+DIR=cells_openff/610381
 
 # ===================== RUN PARAMETERS =====================
-TEMPS=(300 400 500 600)   # K: one independent run per value
+TEMPS=(350 400 500 600)   # K: one independent run per value
 PRESSURES=(1)          # atm: one independent run per value (cross product with TEMPS)
 MAX_PER=8                 # max MPI ranks per run (~250+ atoms per rank)
 RUN_EQUIL=${RUN_EQUIL:-1} # 0 = skip crystal+liquid stages (if *_eq.data exist)
-NMOL=256
+NMOL=160
 # ==========================================================
 
 mkdir -p "$DIR"
+INPUT_NAME=$(basename "$INPUT")
+cp -f "$INPUT" "$DIR/$INPUT_NAME"
+INPUT_RUN="$DIR/$INPUT_NAME"
 
 # Crystal file and molecule count are taken from <DIR>/<name>_n<N>.data
 STEM=$(basename "$DIR")
@@ -88,7 +91,7 @@ run_TP() {   # $1 = T, $2 = P, $3 = list of cores for this run
         st=${pair%%:*}; name=${pair##*:}
         # taskset pins the run; --bind-to none stops mpirun from rebinding
         if ! taskset -c "$cpus" "${MPIRUN}" -np "$PER" --bind-to none \
-            "${LMP_BIN}" -in "$INPUT" \
+            "${LMP_BIN}" -in "$INPUT_RUN" \
                 -var T_run "$T" -var P "$P" -var dir "$DIR" \
                 -var cryst_file "$CRYST" -var n_mol_cryst "$NMOL" -var stage $st \
             -log "$DIR/log.${SLURM_JOB_ID}.${tag}.${name}" \
